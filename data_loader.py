@@ -25,7 +25,7 @@ class ToTensorTan(object):
         pass
 
     def __call__(self, img):
-        img =np.array(img)
+        img = np.array(img)
         img = (img - 127.5) / 127.5
         img = t.tensor(img).permute(dims=[2, 0, 1])
         return img
