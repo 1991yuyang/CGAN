@@ -29,9 +29,10 @@ class FC(nn.Module):
 
 class Generator(nn.Module):
 
-    def __init__(self, noise_dim, class_num, g_feature_count, img_size):
+    def __init__(self, noise_dim, class_num, g_feature_count, img_size, is_gray):
         super(Generator, self).__init__()
         self.img_size = img_size
+        self.is_gray = is_gray
         self.process_condittion = nn.Sequential(
             FC(in_features=class_num, out_features=32, is_bn=True, act_name="leaky"),
             FC(in_features=32, out_features=64, is_bn=True, act_name="leaky"),
@@ -44,23 +45,32 @@ class Generator(nn.Module):
             out_features = feature_count
             self.model.add_module("fc_%d" % (i,), FC(in_features=in_features, out_features=out_features, is_bn=True, act_name="leaky"))
             in_features = out_features
-        self.model.add_module("fc_final", FC(in_features=out_features, out_features=3 * img_size ** 2, is_bn=False, act_name="tanh"))
+        if is_gray:
+            self.model.add_module("fc_final", FC(in_features=out_features, out_features=1 * img_size ** 2, is_bn=False, act_name="tanh"))
+        else:
+            self.model.add_module("fc_final", FC(in_features=out_features, out_features=3 * img_size ** 2, is_bn=False,
+                                                 act_name="tanh"))
 
     def forward(self, x, condition):
         one_hot_result = F.one_hot(condition, num_classes=self.class_num).type(t.FloatTensor).to(x.device)
         concate_result = t.cat([x, self.process_condittion(one_hot_result)], dim=1).type(t.FloatTensor).to(x.device)
         ret = self.model(concate_result)
+        if self.is_gray:
+            return ret.view((ret.size()[0], 1, self.img_size, self.img_size))
         return ret.view((ret.size()[0], 3, self.img_size, self.img_size))
 
 
 class Discriminator(nn.Module):
 
-    def __init__(self, d_feature_count, img_size, class_num):
+    def __init__(self, d_feature_count, img_size, class_num, is_gray):
         super(Discriminator, self).__init__()
         self.class_num = class_num
         self.img_size = img_size
         self.model = nn.Sequential()
-        in_features = img_size ** 2 * 3 + class_num
+        if is_gray:
+            in_features = img_size ** 2 * 1 + class_num
+        else:
+            in_features = img_size ** 2 * 3 + class_num
         self.process_condittion = nn.Sequential(
             FC(in_features=class_num, out_features=32, is_bn=True, act_name="relu"),
             FC(in_features=32, out_features=64, is_bn=True, act_name="relu"),

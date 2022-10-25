@@ -48,7 +48,10 @@ def train(g, d, g_optimizer, d_optimizer, loader, d_criterion, g_criterion, curr
             fake_condition_list = fake_condition_cuda.cpu().detach().numpy().tolist()
             os.mkdir(os.path.join(test_save_img_dir, str(total_step)))
             for i in range(batch_size):
-                fake_img = fake_imgs[i]
+                if is_gray:
+                    fake_img = fake_imgs[i, :, :, 0]
+                else:
+                    fake_img = fake_imgs[i]
                 condition = fake_condition_list[i]
                 class_name = idx_2_class[condition]
                 pil_save_pth = os.path.join(img_save_pth, "%s.jpg" % class_name)
@@ -60,10 +63,10 @@ def train(g, d, g_optimizer, d_optimizer, loader, d_criterion, g_criterion, curr
 
 
 def main():
-    g = Generator(noise_dim, class_num, g_feature_count, img_size)
+    g = Generator(noise_dim, class_num, g_feature_count, img_size, is_gray)
     g = nn.DataParallel(module=g, device_ids=device_ids)
     g = g.cuda(device_ids[0])
-    d = Discriminator(d_feature_count, img_size, class_num)
+    d = Discriminator(d_feature_count, img_size, class_num, is_gray)
     d = nn.DataParallel(module=d, device_ids=device_ids)
     d = d.cuda(device_ids[0])
     d_criterion = DLoss(noise_dim, class_num).cuda(device_ids[0])
@@ -74,7 +77,7 @@ def main():
     g_lr_sch = optim.lr_scheduler.CosineAnnealingLR(g_optimizer, T_max=epoch, eta_min=d_final_lr)
     for e in range(epoch):
         current_epoch = e + 1
-        loader, class_2_idx = create_data_loader(data_root_dir, img_size, num_workers, batch_size)
+        loader, class_2_idx = create_data_loader(data_root_dir, img_size, num_workers, batch_size, is_gray)
         d, g = train(g, d, g_optimizer, d_optimizer, loader, d_criterion, g_criterion, current_epoch, class_2_idx)
         d_lr_sch.step()
         g_lr_sch.step()
@@ -83,22 +86,23 @@ def main():
 if __name__ == "__main__":
     CUDA_VISIBLE_DEVICES = "0"
     os.environ["CUDA_VISIBLE_DEVICES"] = CUDA_VISIBLE_DEVICES
-    data_root_dir = r"F:\data\animal\animal image dataset\animals\animals"
+    data_root_dir = r"F:\data\mnist"
     epoch = 500
     batch_size = 64
     noise_dim = 128
-    d_init_lr = 1e-3
-    d_final_lr = 1e-4
-    g_init_lr = 1e-2
-    g_final_lr = 1e-3
-    img_size = 64
-    g_feature_count = [64, 128, 256, 512]
+    d_init_lr = 1e-5
+    d_final_lr = 1e-6
+    g_init_lr = 1e-4
+    g_final_lr = 1e-5
+    img_size = 28
+    g_feature_count = [128, 256, 512]
     d_train_times = 1
-    test_step = 100
+    test_step = 1000
     num_workers = 4
-    use_clip_weight = False
-    clip_weight_min = -0.5
-    clip_weight_max = 0.5
+    use_clip_weight = True
+    clip_weight_min = -0.15
+    clip_weight_max = 0.15
+    is_gray = True
     test_save_img_dir = r"test_images"
     if os.path.exists(test_save_img_dir):
         shutil.rmtree(test_save_img_dir)
