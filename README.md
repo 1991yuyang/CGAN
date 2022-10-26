@@ -1,7 +1,7 @@
 # CGAN
 conditional gan
 # result  
-generate 0 to 9
+generate 0 to 9  
 train 1000 steps:  
 <img src="https://github.com/1991yuyang/CGAN/blob/main/test_images/1000/0.jpg" width="64" height="64"><img src="https://github.com/1991yuyang/CGAN/blob/main/test_images/1000/1.jpg" width="64" height="64"><img src="https://github.com/1991yuyang/CGAN/blob/main/test_images/1000/2.jpg" width="64" height="64"><img src="https://github.com/1991yuyang/CGAN/blob/main/test_images/1000/3.jpg" width="64" height="64"><img src="https://github.com/1991yuyang/CGAN/blob/main/test_images/1000/4.jpg" width="64" height="64"><img src="https://github.com/1991yuyang/CGAN/blob/main/test_images/1000/5.jpg" width="64" height="64"><img src="https://github.com/1991yuyang/CGAN/blob/main/test_images/1000/6.jpg" width="64" height="64"><img src="https://github.com/1991yuyang/CGAN/blob/main/test_images/1000/7.jpg" width="64" height="64"><img src="https://github.com/1991yuyang/CGAN/blob/main/test_images/1000/8.jpg" width="64" height="64"><img src="https://github.com/1991yuyang/CGAN/blob/main/test_images/1000/9.jpg" width="64" height="64">  
 train 3000 steps:  
