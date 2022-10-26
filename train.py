@@ -94,7 +94,7 @@ if __name__ == "__main__":
     d_final_lr = 1e-4
     g_init_lr = 1e-3
     g_final_lr = 1e-4
-    g_feature_count = [32, 64, 128, 256, 512]  # image_size will be 2 ** len(g_feature_count)
+    g_feature_count = [16, 32, 64, 128, 256, 512]  # image_size will be 2 ** len(g_feature_count)
     d_train_times = 1
     test_step = 1000
     num_workers = 4
