@@ -13,7 +13,7 @@ class GLoss(nn.Module):
     def forward(self, discriminator, generator, condition):
         generator.train()
         discriminator.eval()
-        noise = t.from_numpy(rd.normal(0, 1, (condition.size()[0], self.noise_dim))).type(t.FloatTensor).to(condition.device)
+        noise = t.from_numpy(rd.normal(0, 1, (condition.size()[0], self.noise_dim, 1, 1))).type(t.FloatTensor).to(condition.device)
         fake_img = generator(noise, condition)
         fake_d_output = discriminator(fake_img, condition)
         target = t.ones(fake_d_output.size()).type(t.FloatTensor).to(fake_d_output.device)
@@ -33,7 +33,7 @@ class DLoss(nn.Module):
         discriminator.train()
         generator.eval()
         batch_size = real_img.size()[0]
-        noise = t.from_numpy(rd.normal(0, 1, (batch_size, self.noise_dim))).type(t.FloatTensor).to(real_img.device)
+        noise = t.from_numpy(rd.normal(0, 1, (batch_size, self.noise_dim, 1, 1))).type(t.FloatTensor).to(real_img.device)
         fake_condition = t.from_numpy(rd.randint(0, self.class_num, batch_size)).type(t.LongTensor).cuda(real_condition.device)
         with t.no_grad():
             fake_img = generator(noise, fake_condition)
