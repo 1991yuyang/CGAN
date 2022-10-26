@@ -1,5 +1,5 @@
 # CGAN
-conditional gan
+conditional gan reimplementation  
 # result  
 generate 0 to 9  
 train 1000 steps:  
